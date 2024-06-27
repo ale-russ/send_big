@@ -4,20 +4,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback toggleMenu;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.toggleMenu,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
+      titleSpacing: 4,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Image.asset(
-            'assets/images/sendBig.png',
-            width: 160,
+            // 'assets/images/sendBig.png',
+            'assets/images/logo.PNG',
+            // height: 160,
+            // width: 160,
           ),
           IconButton(
             onPressed: toggleMenu,

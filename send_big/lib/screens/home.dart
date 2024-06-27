@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:send_big/widgets/home_elements.dart';
 import '../models/languages.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/menu_widget.dart';
@@ -56,7 +57,7 @@ class _HomeState extends State<Home> {
       ),
       body: Stack(
         children: [
-          _buildBodyContainer(),
+          const HomeElements(),
           if (isMenuOpen)
             MenuWidget(
               isMenuOpen: isMenuOpen,
@@ -67,18 +68,6 @@ class _HomeState extends State<Home> {
               menus: menus,
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBodyContainer() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: const Center(
-        child: Text(
-          'Body Content',
-          style: TextStyle(fontSize: 24),
-        ),
       ),
     );
   }

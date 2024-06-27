@@ -1,9 +1,17 @@
 const express = require("express");
-const multer = require("multer");
-const cors = require("cors");
-const path = require("path");
+const MongoClient = require("mongodb").MongoClient;
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const fs = require("fs");
+const path = require("path");
+const cors = require("cors");
+const multer = require("multer");
+
+const mongoUrl = require("./config");
 
 // Set up express app
 const app = express();
@@ -13,6 +21,13 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+
+const client = new MongoClient(mongoUrl);
+
+mongoose
+  .connect(mongoUrl)
+  .then(() => console.log("CONNECTED TO MONGODB"))
+  .catch((err) => console.log("MONGODB CONNECTION ERROR: ", err));
 
 // Ensure the uploads directory exists
 const uploadDir = "uploads";
