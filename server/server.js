@@ -113,13 +113,13 @@ app.post('/login', async (req, res) => {
     console.log('Password: ', password, ' userPassword, ', user.password);
 
     // Validate the password
-    /*  var isPasswordValid = await bcrypt.compare(password, user.password);
+    var isPasswordValid = await bcrypt.compare(password, user.password);
 
     console.log('isPasswordValid ', isPasswordValid);
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid email or password' });
-    } */
+    }
 
     // Generate a JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
