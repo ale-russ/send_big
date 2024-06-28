@@ -1,9 +1,9 @@
-var mongoose = require("mongoose");
-bcrypt = require("bcryptjs");
+var mongoose = require('mongoose');
+bcrypt = require('bcryptjs');
 Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
- /*  userName: {
+  /*  userName: {
     type: String,
   }, */
   email: {
@@ -17,12 +17,19 @@ var UserSchema = new Schema({
     type: String,
     required: true,
   },
+  files: [
+    {
+      filename: String,
+      path: String,
+      uploadedAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 UserSchema.methods.comparePassword = function (userPassword) {
   return bcrypt.compareSync(userPassword, this.password);
 };
 
-const User = mongoose.model("users", UserSchema);
+const User = mongoose.model('users', UserSchema);
 
 module.exports = User;
