@@ -1,23 +1,20 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 
+import '../screens/auth/login.dart';
+import '../widgets/language_dropdown.dart';
+import '../constants/languages.dart';
 import '../models/languages.dart';
+import '../constants/menus.dart';
 
 class MenuWidget extends StatefulWidget {
   final bool isMenuOpen;
   final VoidCallback toggleMenu;
-  final Language selectedLanguage;
-  final ValueChanged<Language?> onLanguageChanged;
-  final List<Language> languages;
-  final List<String> menus;
 
   const MenuWidget({
     super.key,
     required this.isMenuOpen,
     required this.toggleMenu,
-    required this.selectedLanguage,
-    required this.onLanguageChanged,
-    required this.languages,
-    required this.menus,
   });
 
   @override
@@ -32,10 +29,14 @@ class _MenuWidgetState extends State<MenuWidget>
   late Animation<double> _opacityAnimation;
 
   bool isDropdownOpened = false;
+  Language? selectedLanguage;
+
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
+    selectedLanguage = languages[0];
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -74,6 +75,24 @@ class _MenuWidgetState extends State<MenuWidget>
     }
   }
 
+  void _showLoginOverlay(BuildContext ctx) {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(ctx).insert(_overlayEntry!);
+  }
+
+  void _removeLoginOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+      builder: (ctx) => LoginOverlay(
+        onClose: _removeLoginOverlay,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -87,15 +106,13 @@ class _MenuWidgetState extends State<MenuWidget>
       child: SlideTransition(
         position: _slideAnimation,
         child: Container(
-          // constraints: const BoxConstraints(minHeight: 500),
           color: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // const SizedBox(height: 16),
-                _buildLanguageDropdown(),
+                const LanguageDropdown(),
                 ..._buildListItems(),
                 Container(
                   height: 40,
@@ -121,82 +138,9 @@ class _MenuWidgetState extends State<MenuWidget>
     );
   }
 
-  Widget _buildLanguageDropdown() {
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          child: DropdownButtonFormField<Language>(
-            elevation: 0,
-            icon: const SizedBox.shrink(),
-            isDense: false,
-            isExpanded: true,
-            alignment: AlignmentDirectional.center,
-            dropdownColor: Colors.white,
-            value: widget.selectedLanguage,
-            decoration: const InputDecoration(
-                enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent),
-            )),
-            onChanged: (Language? newValue) {
-              setState(() {
-                widget.onLanguageChanged(newValue);
-              });
-            },
-            items: widget.languages
-                .map<DropdownMenuItem<Language>>((Language value) {
-              return DropdownMenuItem<Language>(
-                value: value,
-                child: Text(
-                  value.fullName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    // fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            }).toList(),
-            onTap: () {
-              setState(() {
-                isDropdownOpened = !isDropdownOpened;
-              });
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                setState(() {
-                  isDropdownOpened = !isDropdownOpened;
-                });
-              });
-            },
-            selectedItemBuilder: (context) {
-              return widget.languages.map<Widget>((Language value) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(4)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        value.displayCode,
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.black),
-                    ],
-                  ),
-                );
-              }).toList();
-            },
-          ),
-        );
-      },
-    );
-  }
-
   List<Widget> _buildListItems() {
     final listItems = <Widget>[];
-    for (var i = 0; i < widget.menus.length; ++i) {
+    for (var i = 0; i < menuItems.length; ++i) {
       listItems.add(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 8),
@@ -204,18 +148,17 @@ class _MenuWidgetState extends State<MenuWidget>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () => _handleMenuItemTap(context, menuItems[i].label!),
                 child: Text(
-                  widget.menus[i],
+                  menuItems[i].label!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 16,
-                    // fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
               const SizedBox(width: 4),
-              if (widget.menus[i] == 'Snap' || widget.menus[i] == 'Max')
+              if (menuItems[i].showNewTag)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
@@ -234,5 +177,25 @@ class _MenuWidgetState extends State<MenuWidget>
       );
     }
     return listItems;
+  }
+
+  void _handleMenuItemTap(BuildContext context, String label) {
+    switch (label) {
+      case 'Snap':
+        log('Snap tapped');
+        break;
+      case 'Max':
+        log('Max tapped');
+        break;
+      case 'Help':
+        log('Help tapped');
+        break;
+      case 'Blog':
+        log('Blog tapped');
+        break;
+      case 'Login':
+        _showLoginOverlay(context);
+        break;
+    }
   }
 }
